@@ -19,6 +19,7 @@ from argo_jupyter_scheduler.utils import (
     WorkflowActionsEnum,
     authenticate,
     gen_cron_workflow_name,
+    gen_html_path,
     gen_papermill_command_input,
     gen_workflow_name,
     sanitize_label,
@@ -28,6 +29,8 @@ from argo_jupyter_scheduler.utils import (
 logger = setup_logger(__name__)
 
 DEFAULT_TTL = 600
+
+print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX22")
 
 
 class ArgoExecutor(ExecutionManager):
@@ -192,14 +195,11 @@ class ArgoExecutor(ExecutionManager):
                 os.environ["PREFERRED_USERNAME"]
             ),
         }
-        cmd_args = [
-            "-c",
-            *gen_papermill_command_input(
-                job.runtime_environment_name,
-                staging_paths["input"],
-                use_conda_store_env,
-            ),
-        ]
+        cmd_args = gen_papermill_command_input(
+            job.runtime_environment_name,
+            staging_paths["input"],
+            use_conda_store_env,
+        )
         envs = []
         if parameters:
             for key, value in parameters.items():
@@ -208,7 +208,7 @@ class ArgoExecutor(ExecutionManager):
         main = Container(
             name="main",
             command=["/bin/sh"],
-            args=cmd_args,
+            args=["-c", f"{cmd_args}"],
             env=envs,
         )
 
@@ -237,6 +237,14 @@ class ArgoExecutor(ExecutionManager):
                 update_job_status_success(
                     name="success",
                     arguments={"db_url": db_url, "job_id": job.job_id},
+                    when=successful,
+                )
+                send_to_slack(
+                    name="send-to-slack",
+                    arguments={
+                        "envs": envs,
+                        "file_path": str(gen_html_path(staging_paths["input"])),
+                    },
                     when=successful,
                 )
 
@@ -312,14 +320,11 @@ class ArgoExecutor(ExecutionManager):
                 os.environ["PREFERRED_USERNAME"]
             ),
         }
-        cmd_args = [
-            "-c",
-            *gen_papermill_command_input(
-                job.runtime_environment_name,
-                staging_paths["input"],
-                use_conda_store_env,
-            ),
-        ]
+        cmd_args = gen_papermill_command_input(
+            job.runtime_environment_name,
+            staging_paths["input"],
+            use_conda_store_env,
+        )
         envs = []
         if parameters:
             for key, value in parameters.items():
@@ -328,7 +333,7 @@ class ArgoExecutor(ExecutionManager):
         main = Container(
             name="main",
             command=["/bin/sh"],
-            args=cmd_args,
+            args=["-c", f"'{cmd_args}'"],
             env=envs,
         )
         ttl_strategy = TTLStrategy(
@@ -383,6 +388,14 @@ class ArgoExecutor(ExecutionManager):
                     arguments={
                         "db_url": db_url,
                         "job_definition_id": job_definition_id,
+                    },
+                    when=successful,
+                )
+                send_to_slack(
+                    name="send-to-slack",
+                    arguments={
+                        "envs": envs,
+                        "file_path": str(gen_html_path(staging_paths["input"])),
                     },
                     when=successful,
                 )
@@ -573,3 +586,28 @@ def create_job_record(
 
         session.add(job)
         session.commit()
+
+
+@script()
+def send_to_slack(envs, file_path):
+    import subprocess
+
+    token = None
+    channel = None
+
+    for env in envs:
+        if env.name == 'SLACK_TOKEN':
+            token = env.value
+        elif env.name == 'SLACK_CHANNEL':
+            channel = env.value
+
+    if token is not None and channel is not None:
+        command = [
+            "curl",
+            "-F", f"file=@{file_path}",
+            "-F", "initial_comment=Attaching new file",
+            "-F", f"channels={channel}",
+            "-H", f"Authorization: Bearer {token}",
+            "https://slack.com/api/files.upload"
+        ]
+        print(subprocess.check_output(command))
