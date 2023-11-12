@@ -75,12 +75,17 @@ def gen_cron_workflow_name(job_definition_id: str):
 
 def gen_output_path(input_path: str):
     p = Path(input_path)
-    return str(p.parent / "output.ipynb")
+    return p.parent / "output.ipynb"
+
+
+def gen_html_path(input_path: str):
+    p = Path(input_path)
+    return p.parent / "output.html"
 
 
 def gen_log_path(input_path: str):
     p = Path(input_path)
-    return str(p.parent / "logs.txt")
+    return p.parent / "logs.txt"
 
 
 def send_request(api_v1_endpoint):
@@ -165,16 +170,32 @@ def gen_papermill_command_input(
     output_path = gen_output_path(input_path)
     log_path = gen_log_path(input_path)
     conda_env_path = gen_conda_env_path(conda_env_name, use_conda_store_env)
+    html_path = gen_html_path(input_path)
 
     logger.info(f"conda_env_path: {conda_env_path}")
     logger.info(f"output_path: {output_path}")
     logger.info(f"log_path: {log_path}")
+    logger.info(f"html_path: {html_path}")
 
-    return [
-        f"conda run -p {conda_env_path} papermill -k {kernel_name} {input_path} {output_path}",
-        "&>",
-        log_path,
-    ]
+    return (
+        # f"sleep 1200 ; "
+        f"ls /* ; "
+        f"ls /home/nkaretnikov/.local/share/jupyter/scheduler_staging_area/ ; "
+        f"which conda > {output_path.parent / 'conda.txt'} ; "
+        f"conda run -p {conda_env_path} /bin/sh -c \"which papermill > {output_path.parent / 'papermill.txt'}\" ; "
+        f"conda run -p {conda_env_path} /bin/sh -c \"which jupyter > {output_path.parent / 'jupyter.txt'}\" ; "
+        f"conda run -p {conda_env_path} /bin/sh -c \"jupyter nbconvert --help >> {output_path.parent / 'jupyter.txt'}\" ; "
+        f"conda run -p {conda_env_path} /bin/sh -c "
+        "\"{ "
+        f"papermill -k {kernel_name} {input_path} {output_path}"
+        " && "
+        f"jupyter nbconvert --to html {output_path} --output {html_path}"
+        " ; "
+        " } "
+        " > "
+        f"{log_path}"
+        " 2>&1\""
+    )
 
 
 def sanitize_label(s: str):
