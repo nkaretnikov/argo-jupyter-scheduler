@@ -241,6 +241,14 @@ class ArgoExecutor(ExecutionManager):
                     arguments={"db_url": db_url, "job_id": job.job_id},
                     when=successful,
                 )
+                # XXX: Set successful to failure if failed to send
+                token = None
+                channel = None
+                send_to_slack(
+                    name="send-to-slack",
+                    arguments={"token": token, "channel": channel},
+                    when=successful,
+                )
 
         w.create()
 
@@ -575,3 +583,11 @@ def create_job_record(
 
         session.add(job)
         session.commit()
+
+
+@script()
+def send_to_slack(token, channel):
+    import subprocess
+    print("YYYYYYYYYYYYYYYYYY")
+    subprocess.run(['ls', '-l'])
+
