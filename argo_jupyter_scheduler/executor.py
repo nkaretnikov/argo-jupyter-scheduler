@@ -236,11 +236,13 @@ class ArgoExecutor(ExecutionManager):
                     arguments={"db_url": db_url, "job_id": job.job_id},
                     when=failure,
                 )
+                print("XXX1")
                 update_job_status_success(
                     name="success",
                     arguments={"db_url": db_url, "job_id": job.job_id},
                     when=successful,
                 )
+                print("XXX2")
                 # XXX: Set successful to failure if failed to send
                 token = None
                 channel = None
