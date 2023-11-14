@@ -181,13 +181,13 @@ def gen_papermill_command_input(
         f"conda run -p {conda_env_path} /bin/sh -c "
         "\"{ "
         f"papermill -k {kernel_name} {input_path} {output_path}"
-        "&&"
+        " && "
         f"jupyter nbconvert --to html {output_path} --output {html_path}"
-        ";"
-        " }"
-        ">"
+        " ; "
+        " } "
+        " > "
         f"{log_path}"
-        "2>&1\""
+        " 2>&1\""
     )
 
 
