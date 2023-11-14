@@ -180,7 +180,7 @@ def gen_papermill_command_input(
     return [
         "{ ",
         f"conda run -p {conda_env_path} papermill -k {kernel_name} {input_path} {output_path}",
-        ";"
+        "&&"
         f"jupyter nbconvert --to html {output_path} --output {html_path}",
         ";"
         " }",
