@@ -206,6 +206,7 @@ class ArgoExecutor(ExecutionManager):
         if parameters:
             for key, value in parameters.items():
                 envs.append(Env(name=key, value=value))
+                print("XXXXXXX: PARAMS:", key, value)
 
         main = Container(
             name="main",
