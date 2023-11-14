@@ -29,7 +29,7 @@ logger = setup_logger(__name__)
 
 DEFAULT_TTL = 600
 
-print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX2")
+print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX3")
 
 
 class ArgoExecutor(ExecutionManager):
@@ -194,14 +194,11 @@ class ArgoExecutor(ExecutionManager):
                 os.environ["PREFERRED_USERNAME"]
             ),
         }
-        cmd_args = [
-            "-c",
-            *gen_papermill_command_input(
-                job.runtime_environment_name,
-                staging_paths["input"],
-                use_conda_store_env,
-            ),
-        ]
+        cmd_args = gen_papermill_command_input(
+            job.runtime_environment_name,
+            staging_paths["input"],
+            use_conda_store_env,
+        )
         envs = []
         if parameters:
             for key, value in parameters.items():
@@ -211,7 +208,7 @@ class ArgoExecutor(ExecutionManager):
         main = Container(
             name="main",
             command=["/bin/sh"],
-            args=cmd_args,
+            args=["-c", f"'{cmd_args}'"],
             env=envs,
         )
 
@@ -325,14 +322,11 @@ class ArgoExecutor(ExecutionManager):
                 os.environ["PREFERRED_USERNAME"]
             ),
         }
-        cmd_args = [
-            "-c",
-            *gen_papermill_command_input(
-                job.runtime_environment_name,
-                staging_paths["input"],
-                use_conda_store_env,
-            ),
-        ]
+        cmd_args = gen_papermill_command_input(
+            job.runtime_environment_name,
+            staging_paths["input"],
+            use_conda_store_env,
+        )
         envs = []
         if parameters:
             for key, value in parameters.items():
@@ -341,7 +335,7 @@ class ArgoExecutor(ExecutionManager):
         main = Container(
             name="main",
             command=["/bin/sh"],
-            args=cmd_args,
+            args=["-c", f"'{cmd_args}'"],
             env=envs,
         )
         ttl_strategy = TTLStrategy(
