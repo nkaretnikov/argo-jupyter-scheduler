@@ -29,7 +29,7 @@ logger = setup_logger(__name__)
 
 DEFAULT_TTL = 600
 
-print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX14")
+print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX15")
 
 
 class ArgoExecutor(ExecutionManager):
@@ -208,8 +208,7 @@ class ArgoExecutor(ExecutionManager):
         main = Container(
             name="main",
             command=["/bin/sh"],
-            # args=["-c", f"'{cmd_args}'"],
-            args=["-c", f"'sleep 1800'"],
+            args=["-c", f"{cmd_args}"],
             env=envs,
         )
 
