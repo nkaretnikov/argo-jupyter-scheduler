@@ -244,11 +244,23 @@ class ArgoExecutor(ExecutionManager):
                 # XXX: Set successful to failure if failed to send
                 token = None
                 channel = None
-                send_to_slack(
-                    name="send-to-slack",
-                    arguments={"token": token, "channel": channel},
-                    when=successful,
-                )
+
+                for env in envs:
+                    if env.name == 'SLACK_TOKEN':
+                        token = env.value
+                    elif env.name == 'SLACK_CHANNEL':
+                        channel = env.value
+
+                if token is not None and channel is not None:
+                    send_to_slack(
+                        name="send-to-slack",
+                        arguments={
+                            "token": token,
+                            "channel": channel,
+                            "file_path": get_html_path(staging_paths["input"]),
+                        },
+                        when=successful,
+                    )
 
         w.create()
 
@@ -583,8 +595,14 @@ def create_job_record(
 
 
 @script()
-def send_to_slack(token, channel):
+def send_to_slack(token, channel, file_path):
     import subprocess
-    print("YYYYYYYYYYYYYYYYYY")
-    subprocess.run(['ls', '-l'])
-
+    command = [
+        "curl",
+        "-F", f"file=@{file_path}",
+        "-F", "initial_comment=Attaching new file",
+        "-F", f"channels={channel}",
+        "-H", f"Authorization: Bearer {token}",
+        "https://slack.com/api/files.upload"
+    ]
+    subprocess.run(command, check=True)
