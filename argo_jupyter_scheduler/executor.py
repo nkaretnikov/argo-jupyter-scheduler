@@ -30,7 +30,7 @@ logger = setup_logger(__name__)
 
 DEFAULT_TTL = 600
 
-print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX17")
+print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX18")
 
 
 class ArgoExecutor(ExecutionManager):
@@ -258,7 +258,7 @@ class ArgoExecutor(ExecutionManager):
                         arguments={
                             "token": token,
                             "channel": channel,
-                            "file_path": gen_html_path(staging_paths["input"]),
+                            "file_path": str(gen_html_path(staging_paths["input"])),
                         },
                         when=successful,
                     )
