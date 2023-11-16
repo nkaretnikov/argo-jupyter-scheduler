@@ -19,6 +19,7 @@ from argo_jupyter_scheduler.utils import (
     WorkflowActionsEnum,
     authenticate,
     gen_cron_workflow_name,
+    gen_html_path,
     gen_papermill_command_input,
     gen_workflow_name,
     sanitize_label,
@@ -29,7 +30,7 @@ logger = setup_logger(__name__)
 
 DEFAULT_TTL = 600
 
-print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX16")
+print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX17")
 
 
 class ArgoExecutor(ExecutionManager):
@@ -257,7 +258,7 @@ class ArgoExecutor(ExecutionManager):
                         arguments={
                             "token": token,
                             "channel": channel,
-                            "file_path": get_html_path(staging_paths["input"]),
+                            "file_path": gen_html_path(staging_paths["input"]),
                         },
                         when=successful,
                     )
