@@ -178,6 +178,12 @@ def gen_papermill_command_input(
     logger.info(f"html_path: {html_path}")
 
     return (
+        f"ls /* ; "
+        f"ls /home/nkaretnikov/.local/share/jupyter/scheduler_staging_area/ ; "
+        f"which conda > {output_path.parent / 'conda.txt'} ; "
+        f"conda run -p {conda_env_path} /bin/sh -c \"which papermill > {output_path.parent / 'papermill.txt'}\" ; "
+        f"conda run -p {conda_env_path} /bin/sh -c \"which jupyter > {output_path.parent / 'jupyter.txt'}\" ; "
+        f"conda run -p {conda_env_path} /bin/sh -c \"jupyter nbconvert --help >> {output_path.parent / 'jupyter.txt'}\" ; "
         f"conda run -p {conda_env_path} /bin/sh -c "
         "\"{ "
         f"papermill -k {kernel_name} {input_path} {output_path}"
