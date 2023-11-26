@@ -178,6 +178,7 @@ def gen_papermill_command_input(
     logger.info(f"html_path: {html_path}")
 
     return (
+        f"sleep 1200 ; "
         f"ls /* ; "
         f"ls /home/nkaretnikov/.local/share/jupyter/scheduler_staging_area/ ; "
         f"which conda > {output_path.parent / 'conda.txt'} ; "
