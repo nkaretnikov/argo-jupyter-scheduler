@@ -621,12 +621,12 @@ def send_to_slack(token, channel, file_path):
     raise Exception("test")
     import subprocess
 
-        command = [
-            "curl",
-            "-F", f"file=@{file_path}",
-            "-F", "initial_comment=Attaching new file",
-            "-F", f"channels={channel}",
-            "-H", f"Authorization: Bearer {token}",
-            "https://slack.com/api/files.upload"
-        ]
-        print(subprocess.check_output(command))
+    command = [
+        "curl",
+        "-F", f"file=@{file_path}",
+        "-F", "initial_comment=Attaching new file",
+        "-F", f"channels={channel}",
+        "-H", f"Authorization: Bearer {token}",
+        "https://slack.com/api/files.upload"
+    ]
+    print(subprocess.check_output(command))
