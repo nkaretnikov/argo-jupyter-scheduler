@@ -229,22 +229,30 @@ class ArgoExecutor(ExecutionManager):
         ) as w:
             with Steps(name="steps"):
                 Step(name="main", template=main, continue_on=ContinueOn(failed=True))
+
+                token, channel = get_slack_token_channel(envs)
+                if token is not None and channel is not None:
+                    send_to_slack(
+                        name="send-to-slack",
+                        arguments={
+                            "token": token,
+                            "channel": channel,
+                            "file_path": str(gen_html_path(staging_paths["input"])),
+                        },
+                        when=successful,
+                    )
+                    failure += " || {{steps.send-to-slack.status}} == Failed"
+                    successful += " && {{steps.send-to-slack.status}} == Succeeded"
+
                 update_job_status_failure(
                     name="failure",
                     arguments={"db_url": db_url, "job_id": job.job_id},
                     when=failure,
                 )
+
                 update_job_status_success(
                     name="success",
                     arguments={"db_url": db_url, "job_id": job.job_id},
-                    when=successful,
-                )
-                send_to_slack(
-                    name="send-to-slack",
-                    arguments={
-                        "envs": envs,
-                        "file_path": str(gen_html_path(staging_paths["input"])),
-                    },
                     when=successful,
                 )
 
@@ -374,7 +382,23 @@ class ArgoExecutor(ExecutionManager):
                         "job_definition_id": job_definition_id,
                     },
                 )
+
                 Step(name="main", template=main, continue_on=ContinueOn(failed=True))
+
+                token, channel = get_slack_token_channel(envs)
+                if token is not None and channel is not None:
+                    send_to_slack(
+                        name="send-to-slack",
+                        arguments={
+                            "token": token,
+                            "channel": channel,
+                            "file_path": str(gen_html_path(staging_paths["input"])),
+                        },
+                        when=successful,
+                    )
+                    failure += " || {{steps.send-to-slack.status}} == Failed"
+                    successful += " && {{steps.send-to-slack.status}} == Succeeded"
+
                 update_job_status_failure(
                     name="failure",
                     arguments={
@@ -383,19 +407,12 @@ class ArgoExecutor(ExecutionManager):
                     },
                     when=failure,
                 )
+
                 update_job_status_success(
                     name="success",
                     arguments={
                         "db_url": db_url,
                         "job_definition_id": job_definition_id,
-                    },
-                    when=successful,
-                )
-                send_to_slack(
-                    name="send-to-slack",
-                    arguments={
-                        "envs": envs,
-                        "file_path": str(gen_html_path(staging_paths["input"])),
                     },
                     when=successful,
                 )
@@ -588,21 +605,22 @@ def create_job_record(
         session.commit()
 
 
+def get_slack_token_channel(envs):
+    token = None
+    channel = None
+    for env in envs:
+        if env.name == 'SLACK_TOKEN':
+            token = env.value
+        elif env.name == 'SLACK_CHANNEL':
+            channel = env.value
+    return token, channel
+
+
 @script()
-def send_to_slack(envs, file_path):
+def send_to_slack(token, channel, file_path):
     raise Exception("test")
     import subprocess
 
-    token = None
-    channel = None
-
-    for env in envs:
-        if env['name'] == 'SLACK_TOKEN':
-            token = env['value']
-        elif env['name'] == 'SLACK_CHANNEL':
-            channel = env['value']
-
-    if token is not None and channel is not None:
         command = [
             "curl",
             "-F", f"file=@{file_path}",
