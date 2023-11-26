@@ -30,7 +30,7 @@ logger = setup_logger(__name__)
 
 DEFAULT_TTL = 600
 
-print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX32")
+print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX33")
 
 
 class ArgoExecutor(ExecutionManager):
@@ -620,7 +620,7 @@ def get_slack_token_channel(envs):
 
 @script()
 def send_to_slack(token, channel, file_path):
-    raise Exception("test")
+    import json
     import subprocess
 
     command = [
@@ -629,6 +629,10 @@ def send_to_slack(token, channel, file_path):
         "-F", "initial_comment=Attaching new file",
         "-F", f"channels={channel}",
         "-H", f"Authorization: Bearer {token}",
-        "https://slack.com/api/files.upload"
+        "https://slack.com/api/files.uploadTEST"  # XXX: invalid URL
     ]
-    print(subprocess.check_output(command))
+    result = subprocess.check_output(command)
+    print(result)
+    d = json.loads(result)
+    if not d.get("ok"):
+        raise Exception("Failed to send to Slack")
