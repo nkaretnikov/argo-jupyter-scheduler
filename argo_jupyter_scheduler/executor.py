@@ -30,7 +30,7 @@ logger = setup_logger(__name__)
 
 DEFAULT_TTL = 600
 
-print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX29")
+print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX30")
 
 
 class ArgoExecutor(ExecutionManager):
@@ -590,6 +590,7 @@ def create_job_record(
 
 @script()
 def send_to_slack(envs, file_path):
+    raise Exception("test")
     import subprocess
 
     token = None
