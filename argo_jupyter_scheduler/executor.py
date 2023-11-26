@@ -30,7 +30,7 @@ logger = setup_logger(__name__)
 
 DEFAULT_TTL = 600
 
-print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX33")
+print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX34")
 
 
 class ArgoExecutor(ExecutionManager):
@@ -629,7 +629,7 @@ def send_to_slack(token, channel, file_path):
         "-F", "initial_comment=Attaching new file",
         "-F", f"channels={channel}",
         "-H", f"Authorization: Bearer {token}",
-        "https://slack.com/api/files.uploadTEST"  # XXX: invalid URL
+        "https://slack.com/api/files.upload"
     ]
     result = subprocess.check_output(command)
     print(result)
