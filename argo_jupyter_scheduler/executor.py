@@ -30,7 +30,7 @@ logger = setup_logger(__name__)
 
 DEFAULT_TTL = 600
 
-print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX31")
+print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX32")
 
 
 class ArgoExecutor(ExecutionManager):
@@ -240,6 +240,7 @@ class ArgoExecutor(ExecutionManager):
                             "file_path": str(gen_html_path(staging_paths["input"])),
                         },
                         when=successful,
+                        continue_on=ContinueOn(failed=True),
                     )
                     failure += " || {{steps.send-to-slack.status}} == Failed"
                     successful += " && {{steps.send-to-slack.status}} == Succeeded"
@@ -395,6 +396,7 @@ class ArgoExecutor(ExecutionManager):
                             "file_path": str(gen_html_path(staging_paths["input"])),
                         },
                         when=successful,
+                        continue_on=ContinueOn(failed=True),
                     )
                     failure += " || {{steps.send-to-slack.status}} == Failed"
                     successful += " && {{steps.send-to-slack.status}} == Succeeded"
