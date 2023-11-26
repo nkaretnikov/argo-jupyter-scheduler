@@ -30,7 +30,7 @@ logger = setup_logger(__name__)
 
 DEFAULT_TTL = 600
 
-print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX22")
+print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX24")
 
 
 class ArgoExecutor(ExecutionManager):
@@ -596,10 +596,10 @@ def send_to_slack(envs, file_path):
     channel = None
 
     for env in envs:
-        if env.name == 'SLACK_TOKEN':
-            token = env.value
-        elif env.name == 'SLACK_CHANNEL':
-            channel = env.value
+        if env['name'] == 'SLACK_TOKEN':
+            token = env['value']
+        elif env['name'] == 'SLACK_CHANNEL':
+            channel = env['value']
 
     if token is not None and channel is not None:
         command = [
