@@ -30,8 +30,6 @@ logger = setup_logger(__name__)
 
 DEFAULT_TTL = 600
 
-print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX34")
-
 
 class ArgoExecutor(ExecutionManager):
     def __init__(
@@ -195,9 +193,10 @@ class ArgoExecutor(ExecutionManager):
                 os.environ["PREFERRED_USERNAME"]
             ),
         }
+        input_path = staging_paths["input"]
         cmd_args = gen_papermill_command_input(
             job.runtime_environment_name,
-            staging_paths["input"],
+            input_path,
             use_conda_store_env,
         )
         envs = []
@@ -237,7 +236,7 @@ class ArgoExecutor(ExecutionManager):
                         arguments={
                             "token": token,
                             "channel": channel,
-                            "file_path": str(gen_html_path(staging_paths["input"])),
+                            "file_path": str(gen_html_path(input_path)),
                         },
                         when=successful,
                         continue_on=ContinueOn(failed=True),
@@ -329,9 +328,10 @@ class ArgoExecutor(ExecutionManager):
                 os.environ["PREFERRED_USERNAME"]
             ),
         }
+        input_path = staging_paths["input"]
         cmd_args = gen_papermill_command_input(
             job.runtime_environment_name,
-            staging_paths["input"],
+            input_path,
             use_conda_store_env,
         )
         envs = []
@@ -354,7 +354,7 @@ class ArgoExecutor(ExecutionManager):
         # mimics internals of the `scheduler.create_job_from_definition` method
         attributes = {
             **job.dict(exclude={"schedule", "timezone"}, exclude_none=True),
-            "input_uri": staging_paths["input"],
+            "input_uri": input_path,
         }
         model = CreateJob(**attributes)
 
@@ -393,7 +393,7 @@ class ArgoExecutor(ExecutionManager):
                         arguments={
                             "token": token,
                             "channel": channel,
-                            "file_path": str(gen_html_path(staging_paths["input"])),
+                            "file_path": str(gen_html_path(input_path)),
                         },
                         when=successful,
                         continue_on=ContinueOn(failed=True),
